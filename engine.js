@@ -10,12 +10,11 @@
 /**************************************************************
  * Engine Initialization
  *************************************************************/
-//Molpy Inspired Cycling Engine
-var MICEngine = {};
-var mice = MICEngine;
-var Content = {};
-//game object, in this case SCB(SandCastle Builder)
-var SCB = {};
+var MICEngine = {}; //Molpy Inspired Cycling Engine
+var mice = MICEngine; //shorthand
+var Content = {}; //Holds all Content
+var logger = {}; //shorthand for mice logger
+var SCB = {}; //game object, in this case SCB(SandCastle Builder)
 
 MICEngine.init = function(){
 	

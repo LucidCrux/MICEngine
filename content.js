@@ -18,7 +18,7 @@ MICEngine.initContent = function() {
 				this[property] = args[property];
 			}
 			
-			//All content types MUST have: init method, id, toString method, fromString method even if they get overwritten by each object
+			//All content types MUST have: init method, id, toString method, fromString method
 			if(!args.init || !args.id || !args.toString || args.fromString){
 				alert('ERROR: Object types must specify an id, and toString and fromString methods. Game may be unstable.')
 			}
