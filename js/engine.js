@@ -13,7 +13,7 @@
 var MICEngine = {}; //Molpy Inspired Cycling Engine
 var mice = MICEngine; //shorthand
 var Content = {}; //Holds all Content
-var logger = {}; //shorthand for mice logger
+var logger = {}; //shorthand for mice logger -maybe-
 var SCB = {}; //game object, in this case SCB(SandCastle Builder)
 
 MICEngine.init = function(){
@@ -27,7 +27,7 @@ MICEngine.init = function(){
 	//Calculated
 	if(3600 % mice.CYCLES_PER_HOUR != 0){
 		alert('Error: Invalid cycles per hour set.');
-	}
+	};
 	mice.HOURS_PER_CYCLE = (1 / mice.CYCLES_PER_HOUR == 1) ? 1 : 0; //whole hours per cycle
 	mice.MINS_PER_CYCLE = (mice.HOURS_PER_CYCLE == 1) ? 0 : Math.floor((60 / mice.CYCLES_PER_HOUR)); //whole minutes per cycle - hours
 	mice.SECS_PER_CYCLE = (mice.HOURS_PER_CYCLE == 1) ? 0 : Math.floor((60 % mice.CYCLES_PER_HOUR)); //seconds per cycle - hours and minutes
@@ -39,31 +39,64 @@ MICEngine.init = function(){
 	mice.cycleNum = 1; //cycle number the game is currently on
 	mice.cycleStartTime = mice.getCycleStart(1); //the time the current cycle started
 	
-	mice.options = {};
+	//allows for the possibility of "save slots"
+	//would be nice to add a way to autoload last used profile
+	mice.profile = new mice.Profile({name: 'default'}); 
 	
-	mice.profile = MICEngine.createBlankProfile(); //holds universal engine data for use in game saves (saves, loads, play time, etc)
+	mice.options = mice.profile.options;
 	
-	mice.Things = {}; //everything other than the engine is a thing
+	//each object included has it's onCycle or onTick method called per cycle or tick
+	mice.callPerCycle = {};
+	mice.callPerTick = {};
 	
+	//start loading stuff
 	mice.initContent();
 	
 	mice.loaded = true;
 }
 
-MICEngine.createBlankProfile = function(){
-	var profile = {};
-	profile.create = new Date().getTime(); //when profile was created
-	profile.saveCount = 0;
-	profile.loadCount = 0;
-	profile.playtime = 0; //total time played
-	profile.lastCycleStart = profile.create; //when the profile was played last
-	profile.options = null; //saveable engine options
-	profile.name = '';
+/**************************************************************
+ * Engine Classes
+ *************************************************************/
+
+MICEngine.Profile = Class.extend({
+	init: function(args) {
+		this.name = args.name || 'default';
+		this.created = new Date();
+		this.lastPlayed = this.created;
+		
+		for(var property in args) {
+			if(!this[property]) this[property] = args[property];
+		}
+	},
 	
-	return profile;	
+	name: '', //the name of the profile
+	created: 0, //date profile was created
+	lastPlayed: 0, //last time the profile was used
+	options: {}, //holds engine option settings
+	
+})
+
+MICEngine.Logger = Class.extend({
+	init: function(args){
+		
+	}
+})
+
+
+/**************************************************************
+ * Cycle Functions
+ *************************************************************/
+
+MICEngine.onNewCycle = function() {
+	
 }
 
-//set the cycle start time to nearest time based on cycle length
+MICEngine.onTick = function() {
+	
+}
+
+//set the cycle start time based on cycle length
 MICEngine.getCycleStart = function(cycleFactor){
 	var time = new Date();
 	if(mice.HOURS_PER_CYCLE != 1) {
@@ -81,14 +114,6 @@ MICEngine.getCycleStart = function(cycleFactor){
 	}
 	
 	return time;
-}
-
-/**************************************************************
- * Cycle Functions
- *************************************************************/
-
-MICEngine.onNewCycle = function() {
-	
 }
 
 

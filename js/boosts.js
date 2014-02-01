@@ -6,14 +6,16 @@
 
 SCB.initBoosts = function () {
 	//create the 'boost' type
-	Content.boost = Content.buyable.extend({
+	Content.Boost = Content.Buyable.extend({
 		init: function(args) {
 			this._super(args);
-			//set all of these manually so error is thrown if mandatory field is missing
+
 			this.single = args.single || this.name;
 			this.plural = args.plural || (this.single || this.name) + 's';
 			
 			this.assignExtraProperties(args); //in case we missed anything
+			
+			Content.Boost.byID[this.id] = this; 
 		},
 		
 		id: 'boost',
@@ -23,22 +25,24 @@ SCB.initBoosts = function () {
 		name: 'new boost',
 		alias: 'newboost',
 		single: 'new boost',
-		plural: 'new boosts',
-		
-		
-		
+		plural: 'new boosts',	
 	});
 	
-	Content.types['boost'] = Content.boost;
+	Content.types['Boost'] = Content.Boost;
+	Content.Boost.byID = []; //list of all boosts by ID
+	Content.Boost.byAlias = []; //list of all boosts by Alias
+	Content.Boost.inShop = []; //boosts currently in shop
+	Content.Boost.owned = 0;
 	
 	/**************************************************************
 	 * Boost Definitions
 	 *************************************************************/
 	
-	//new Content['character']({
-	//	name: 'Dragling',
-		//no more stats since they match default
-	//});
+	new Content.Boost({
+		name: 'test boost 1',
+		id: 1,
+		customProperty: 'test',
+	});
 }
 
 

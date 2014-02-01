@@ -6,7 +6,7 @@
 
 SCB.initCharacters = function () {
 	//create the 'character' type
-	Content.character = Content.buyable.extend({
+	Content.Character = Content.Buyable.extend({
 		//characters are not yet used so init is not really implemented
 		init: function(args) {
 			return this._super(args);
@@ -25,13 +25,13 @@ SCB.initCharacters = function () {
 		intel: 1
 	});
 	
-	Content.types['character'] = Content.character;
+	Content.types['Character'] = Content.Character;
 	
 	/**************************************************************
 	 * Character Definitions
 	 *************************************************************/
 	
-	new Content.character({
+	new Content.Character({
 		name: 'Dragling',
 		//no more stats since they match default
 	})

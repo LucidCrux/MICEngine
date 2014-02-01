@@ -10,11 +10,12 @@ MICEngine.initContent = function() {
 	//not classes used solely for inheritance
 	Content.types = {};
 	
-	Content.typeBase = Class.extend({
+	Content.TypeBase = Class.extend({
 		//never really used
 		init: function (args) {
 			//load all passed properties into the thing
-			for(property in args){
+			console.log('run typeBase init');
+			for(var property in args){
 				this[property] = args[property];
 			}
 			
@@ -24,16 +25,16 @@ MICEngine.initContent = function() {
 			}
 		},
 		
+		track: {}, //list of object properties tracked for save/load
+		
 		//assign any properties left over from overwritten init functions
 		assignExtraProperties: function(args){
-			for(property in args){
+			for(var property in args) {
 				if(!this[property])	this[property] = args[property];
 			}
 		}
 	});
 	
-	//mice.Thing.buyable.character;
-	//mice.Thing.buyable.upgrade;
 	/**************************************************************
 	 * Content Types
 	 * 
@@ -41,24 +42,20 @@ MICEngine.initContent = function() {
 	 * in the game which do not need their own files.
 	 *************************************************************/
 	
-	Content.gameStats = Content.typeBase.extend({
+	Content.StatList = Content.TypeBase.extend({
 		init: function(args) {			
-			console.log('running gameStats init');
+			console.log('running statList init');
 			Content.types[this.id] = this;
 		},
 		
-		id: 'gameStats',
+		id: 'statList',
 		toString: '',
 		fromString: '',
-		
-		saveCount: 0,
-		loadCount: 0,
-		playTime: 0,
 	})
 	
-	Content.types['gameStats'] = Content.gameStats;
+	Content.types['StatList'] = Content.StatList;
 	
-	Content.layout = Content.typeBase.extend({
+	Content.Layout = Content.TypeBase.extend({
 		init: function(args) {
 		},
 		
@@ -67,9 +64,9 @@ MICEngine.initContent = function() {
 		fromString: '',
 	})
 	
-	Content.types['layout'] = Content.layout;
+	Content.types['Layout'] = Content.Layout;
 	
-	Content.buyable = Content.typeBase.extend({
+	Content.Buyable = Content.TypeBase.extend({
 		init: function(args) {
 			this.id = args.id;
 			this.name = args.name; //the buyables in game name
@@ -90,4 +87,27 @@ MICEngine.initContent = function() {
 	//SCB.initCharacters();
 	//SCB.initBadges();
 	SCB.initBoosts();
+}
+
+/**************************************************************
+ * gameStats types
+ *************************************************************/
+
+SCB.initGameStats = function () {
+	new Content.statList({
+		name: 'game stats',
+		id: 0,
+		
+		saveCount:0,
+		loadCount:0,
+		restartCount: 0,
+		playTime:0,
+		lastCycleStart: 0,
+		
+		highestNP: 0,
+		beachClicks: 0,
+		
+		ninjaStreak: 0,
+		ninjaStealthStreak: 0,
+	})
 }
