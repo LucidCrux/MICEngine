@@ -34,7 +34,7 @@ MICEngine.init = function(){
 	mice.TICK_LENGTH = ((mice.HOURS_PER_CYCLE * 3600) + (mice.MINS_PER_CYCLE * 60) + mice.SECS_PER_CYCLE) * 1000 / mice.TICKS_PER_CYCLE; //milliseconds per game tick
 	
 	//Engine Variables
-	mice.ticks = 0; //number of ticks since last update
+	mice.tickCount = 0; //tick number of current cycle
 	mice.time = new Date().getTime();
 	mice.cycleNum = 1; //cycle number the game is currently on
 	mice.cycleStartTime = mice.getCycleStart(1); //the time the current cycle started
@@ -86,14 +86,58 @@ MICEngine.Logger = Class.extend({
 
 /**************************************************************
  * Cycle Functions
+ * 
+ * Functions relating to time progression, game ticks, and
+ * new cycles.
+ * Contains the main game logic loops.
  *************************************************************/
+
+MICEngine.tick = function() {
+	mice.onTick();
+	mice.tickCount ++;
+	if(mice.tickCount >= mice.TICKS_PER_CYCLE) {
+		mice.tickCount = 1;
+		micke.onNewCycle();
+	}
+}
+
+MICEngine.onTick = function() {
+	
+}
 
 MICEngine.onNewCycle = function() {
 	
 }
 
-MICEngine.onTick = function() {
+
+// gameLoop runs on a timer to refresh display and trigger game ticks as necessary
+MICEngine.elapsed = 0;
+MICEngine.gameLoop = function() {
+	var oldTime = mice.time;
+	mice.time = new Date().getTime();
+	mice.elapsed += (mice.time - oldTime);
+	mice.elapsed = Math.min(mice.elapsed, (mice.TICK_LENGTH * 5)); //limit lag to 5 ticks
 	
+	//trigger ticks until catching up to the current tick
+	while(elapsed > mice.TICK_LENGTH){
+		try{
+			mice.tick();
+		} catch (e) {
+			alert('Game tick error:\n' + e + '\n\n' + e.stack);
+			throw e;
+			return;
+		}
+		mice.elapsed -= mice.TICK_LENGTH;
+	}
+	try{
+		mice.draw();
+	} catch(e) {
+		alert('Error drawing game:\n' + e + '\n\n' + e.stack);
+		throw e;
+		return;
+	}
+	
+	setTimeout(mice.gameLoop(), (1000 / mice.FPS));
 }
 
 //set the cycle start time based on cycle length
@@ -114,6 +158,16 @@ MICEngine.getCycleStart = function(cycleFactor){
 	}
 	
 	return time;
+}
+
+/**************************************************************
+ * Drawing and Layout Functions
+ * 
+ * Functions relating to the display of the game.
+ *************************************************************/
+
+MICEngine.draw = function() {
+	
 }
 
 
