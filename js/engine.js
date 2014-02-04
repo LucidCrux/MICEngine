@@ -14,7 +14,7 @@ var MICEngine = {}; //Molpy Inspired Cycling Engine
 var mice = MICEngine; //shorthand
 var Content = {}; //Holds all Content
 var logger = {}; //shorthand for mice logger -maybe-
-var SCB = {}; //game object, in this case SCB(SandCastle Builder)
+var SCB = {}; //game object, in this case SCB (SandCastle Builder), !!!! replace with your game object !!!!
 
 MICEngine.init = function(){
 	
@@ -26,7 +26,8 @@ MICEngine.init = function(){
 	
 	//Calculated
 	if(3600 % mice.CYCLES_PER_HOUR != 0){
-		alert('Error: Invalid cycles per hour set.');
+		alert('Error: Invalid cycles per hour set: engine.js > MICEngine.init()');
+		return;
 	};
 	mice.HOURS_PER_CYCLE = (1 / mice.CYCLES_PER_HOUR == 1) ? 1 : 0; //whole hours per cycle
 	mice.MINS_PER_CYCLE = (mice.HOURS_PER_CYCLE == 1) ? 0 : Math.floor((60 / mice.CYCLES_PER_HOUR)); //whole minutes per cycle - hours
@@ -39,6 +40,9 @@ MICEngine.init = function(){
 	mice.cycleNum = 1; //cycle number the game is currently on
 	mice.cycleStartTime = mice.getCycleStart(1); //the time the current cycle started
 	
+	mice.autoSaveTicks = 0; //number of ticks since last save
+	mice.doSave = false; //auto save this tick?
+	
 	//allows for the possibility of "save slots"
 	//would be nice to add a way to autoload last used profile
 	mice.profile = new mice.Profile({name: 'default'}); 
@@ -46,11 +50,12 @@ MICEngine.init = function(){
 	mice.options = mice.profile.options;
 	
 	//each object included has it's onCycle or onTick method called per cycle or tick
-	mice.callPerCycle = {};
-	mice.callPerTick = {};
+	mice.callPerCycle = [SCB];
+	mice.callPerTick = [SCB];
 	
 	//start loading stuff
 	mice.initContent();
+	scb.init(); //!!!! replace with your game initialization !!!!
 	
 	mice.loaded = true;
 }
@@ -73,7 +78,11 @@ MICEngine.Profile = Class.extend({
 	name: '', //the name of the profile
 	created: 0, //date profile was created
 	lastPlayed: 0, //last time the profile was used
-	options: {}, //holds engine option settings
+	options: { //holds engine option settings
+		autoSave: true,
+		autoSaveDelay: 30, //in ticks
+		euroNumbers: false,
+	}
 	
 })
 
@@ -89,7 +98,7 @@ MICEngine.Logger = Class.extend({
  * 
  * Functions relating to time progression, game ticks, and
  * new cycles.
- * Contains the main game logic loops.
+ * !!!! Contains the main game logic loops. !!!!
  *************************************************************/
 
 MICEngine.tick = function() {
@@ -97,16 +106,33 @@ MICEngine.tick = function() {
 	mice.tickCount ++;
 	if(mice.tickCount >= mice.TICKS_PER_CYCLE) {
 		mice.tickCount = 1;
-		micke.onNewCycle();
+		mice.onNewCycle();
+	}
+	
+	//SAVE LAST!
+	if(mice.doSave) {
+		mice.save();
+		mice.autoSaveTicks = 0;
+		mice.doSave = false;
 	}
 }
 
 MICEngine.onTick = function() {
+	mice.autoSaveTicks++;
+	if(mice.options.autoSave && mice.options.autoSaveDelay < mice.autoSaveTicks)
+		mice.doSave = true;
 	
+	//call object tick methods
+	for(obj in mice.callPerTick) {
+		mice.callPerTick[obj].onTick();
+	}
 }
 
 MICEngine.onNewCycle = function() {
-	
+	//call object cycle methods
+	for(obj in mice.callPerCycle) {
+		mice.callPerCycle[obj].onCycle();
+	}
 }
 
 
@@ -119,7 +145,7 @@ MICEngine.gameLoop = function() {
 	mice.elapsed = Math.min(mice.elapsed, (mice.TICK_LENGTH * 5)); //limit lag to 5 ticks
 	
 	//trigger ticks until catching up to the current tick
-	while(elapsed > mice.TICK_LENGTH){
+	while(mice.elapsed > mice.TICK_LENGTH){
 		try{
 			mice.tick();
 		} catch (e) {
@@ -137,7 +163,7 @@ MICEngine.gameLoop = function() {
 		return;
 	}
 	
-	setTimeout(mice.gameLoop(), (1000 / mice.FPS));
+	setTimeout(mice.gameLoop, (1000 / mice.FPS));
 }
 
 //set the cycle start time based on cycle length
@@ -167,6 +193,19 @@ MICEngine.getCycleStart = function(cycleFactor){
  *************************************************************/
 
 MICEngine.draw = function() {
+	g('onlydiv').innerHTML = mice.tickCount;
+}
+
+/**************************************************************
+ * Other functions
+ * Probably should change regroup these later
+ *************************************************************/
+
+MICEngine.save = function() {
+	
+}
+
+MICEngine.load = function(profile) {
 	
 }
 
@@ -204,7 +243,7 @@ window.onload = function() {
 	MICEngine.init();
 	if(mice.loaded) {
 		alert('MICE loaded.');
-		//do stuff
+		mice.gameLoop(); //start the game
 	} else {
 		alert('Error: Failed to load MICEngine.');
 	}
