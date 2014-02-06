@@ -103,7 +103,7 @@ MICEngine.Logger = Class.extend({
 
 MICEngine.tick = function() {
 	mice.onTick();
-	mice.tickCount ++;
+	mice.tickCount++;
 	if(mice.tickCount >= mice.TICKS_PER_CYCLE) {
 		mice.tickCount = 1;
 		mice.onNewCycle();
@@ -128,7 +128,7 @@ MICEngine.onTick = function() {
 	}
 }
 
-MICEngine.onNewCycle = function() {
+MICEngine.onCycle = function() {
 	//call object cycle methods
 	for(obj in mice.callPerCycle) {
 		mice.callPerCycle[obj].onCycle();

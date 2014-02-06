@@ -25,7 +25,7 @@ MICEngine.initContent = function() {
 			}
 		},
 		
-		track: {}, //list of object properties tracked for save/load
+		track: [], //list of object properties tracked for save/load
 		
 		//assign any properties left over from overwritten init functions
 		assignExtraProperties: function(args){
