@@ -10,11 +10,14 @@
 /**************************************************************
  * Engine Initialization
  *************************************************************/
-var MICEngine = {}; //Molpy Inspired Cycling Engine
+var MICEngine = {}; //Molpy Inspired Cyclic Engine
 var mice = MICEngine; //shorthand
 var Content = {}; //Holds all Content
 var logger = {}; //shorthand for mice logger -maybe-
 var SCB = {}; //game object, in this case SCB (SandCastle Builder), !!!! replace with your game object !!!!
+
+// Youri: [TEMP] Required to prevent error
+SCB.onTick = function() { return; };
 
 MICEngine.init = function(){
 	
@@ -26,7 +29,7 @@ MICEngine.init = function(){
 	
 	//Calculated
 	if(3600 % mice.CYCLES_PER_HOUR != 0){
-		alert('Error: Invalid cycles per hour set: engine.js > MICEngine.init()');
+		mice.Logger.Log('Invalid cycles per hour set: engine.js > MICEngine.init()', 'error');
 		return;
 	};
 	mice.HOURS_PER_CYCLE = (1 / mice.CYCLES_PER_HOUR == 1) ? 1 : 0; //whole hours per cycle
@@ -55,7 +58,7 @@ MICEngine.init = function(){
 	
 	//start loading stuff
 	mice.initContent();
-	scb.init(); //!!!! replace with your game initialization !!!!
+	//SCB.init(); //!!!! replace with your game initialization !!!!
 	
 	mice.loaded = true;
 }
@@ -64,33 +67,6 @@ MICEngine.init = function(){
  * Engine Classes
  *************************************************************/
 
-MICEngine.Profile = Class.extend({
-	init: function(args) {
-		this.name = args.name || 'default';
-		this.created = new Date();
-		this.lastPlayed = this.created;
-		
-		for(var property in args) {
-			if(!this[property]) this[property] = args[property];
-		}
-	},
-	
-	name: '', //the name of the profile
-	created: 0, //date profile was created
-	lastPlayed: 0, //last time the profile was used
-	options: { //holds engine option settings
-		autoSave: true,
-		autoSaveDelay: 30, //in ticks
-		euroNumbers: false,
-	}
-	
-})
-
-MICEngine.Logger = Class.extend({
-	init: function(args){
-		
-	}
-})
 
 
 /**************************************************************
@@ -123,14 +99,14 @@ MICEngine.onTick = function() {
 		mice.doSave = true;
 	
 	//call object tick methods
-	for(obj in mice.callPerTick) {
+	for(var obj in mice.callPerTick) {
 		mice.callPerTick[obj].onTick();
 	}
 }
 
 MICEngine.onCycle = function() {
 	//call object cycle methods
-	for(obj in mice.callPerCycle) {
+	for(var obj in mice.callPerCycle) {
 		mice.callPerCycle[obj].onCycle();
 	}
 }
@@ -149,7 +125,7 @@ MICEngine.gameLoop = function() {
 		try{
 			mice.tick();
 		} catch (e) {
-			alert('Game tick error:\n' + e + '\n\n' + e.stack);
+			mice.Logger.Log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
 			throw e;
 			return;
 		}
@@ -158,7 +134,7 @@ MICEngine.gameLoop = function() {
 	try{
 		mice.draw();
 	} catch(e) {
-		alert('Error drawing game:\n' + e + '\n\n' + e.stack);
+		mice.Logger.Log('Error drawing game:\n' + e + '\n\n' + e.stack, 'error');
 		throw e;
 		return;
 	}
@@ -201,10 +177,12 @@ MICEngine.draw = function() {
  * Probably should change regroup these later
  *************************************************************/
 
+// Youri: Replacing by MICEngine.State.Save
 MICEngine.save = function() {
 	
 }
 
+// Youri: Replacing by MICEngine.State.Load
 MICEngine.load = function(profile) {
 	
 }
@@ -242,9 +220,9 @@ function addCSSRule(sheet, selector, rules, index) {
 window.onload = function() {
 	MICEngine.init();
 	if(mice.loaded) {
-		alert('MICE loaded.');
+		mice.Logger.Log('MICE loaded.');
 		mice.gameLoop(); //start the game
 	} else {
-		alert('Error: Failed to load MICEngine.');
+		mice.Logger.Log('Failed to load MICEngine.', 'error');
 	}
 };
