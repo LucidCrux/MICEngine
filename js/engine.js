@@ -18,6 +18,7 @@ var SCB = {}; //game object, in this case SCB (SandCastle Builder), !!!! replace
 
 // Youri: [TEMP] Required to prevent error
 SCB.onTick = function() { return; };
+SCB.onCycle = function() { return; };
 
 MICEngine.init = function(){
 	
@@ -82,7 +83,8 @@ MICEngine.tick = function() {
 	mice.tickCount++;
 	if(mice.tickCount >= mice.TICKS_PER_CYCLE) {
 		mice.tickCount = 1;
-		mice.onNewCycle();
+		mice.Logger.Log('Cycle '+ mice.cycleNum +' finished');
+		mice.onCycle();
 	}
 	
 	//SAVE LAST!
@@ -105,6 +107,8 @@ MICEngine.onTick = function() {
 }
 
 MICEngine.onCycle = function() {
+	mice.cycleNum++;
+	
 	//call object cycle methods
 	for(var obj in mice.callPerCycle) {
 		mice.callPerCycle[obj].onCycle();

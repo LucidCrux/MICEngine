@@ -33,6 +33,50 @@ mice.Profile = Class.extend({
 	
 });
 
+mice.Profiles = new function() {
+	var profiles = {};
+	// Access to profiles for testing purposes
+	this.profiles = function() { return profiles; };
+	
+	// Profile Interface with default properties and values
+	var ProfileBase = function() {
+		return {
+			name: '', 
+			created: 0, 
+			lastPlayed: 0, 
+			options: {
+				autoSave: true, 
+				autoSaveDelay: 30, 
+				euroNumbers: false
+			}
+		};
+	};
+	
+	// Profile Constructor
+	var Profile = function(params) {
+		for (var p in params)
+			if (typeof this[p] !== 'undefined')
+				this[p] = params[p];
+		return this;
+	};
+	
+	// Create a new Profile
+	this.Create = function(params) {
+		profiles[params.name] = Profile.call((new ProfileBase()), params);
+	};
+	
+	// Delete a Profile
+	this.Delete = function(name) {
+		delete profiles[name];
+		this.Active = undefined;
+	};
+	
+	// Set selected Profile as Active Profile
+	this.SetActive = function(name) {
+		this.Active = profiles[name];
+	};
+};
+
 
 /**************************************************************
  * State management
