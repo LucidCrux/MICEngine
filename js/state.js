@@ -3,7 +3,7 @@
 /**************************************************************
  * state.js
  * 
- * Contains various functions related to managing saveState
+ * Contains various functions related to managing game states
  *************************************************************/
 
 
@@ -12,120 +12,92 @@
  *************************************************************/
 
 mice.Profile = Class.extend({
-	init: function(args) {
-		this.name = args.name || 'default';
-		this.created = new Date();
-		this.lastPlayed = this.created;
-		
+	name: 'default',
+	created: new Date(), // Date profile was created
+	lastPlayed: this.created,
+	options: { // Holds engine option settings
+		autoSave: true,
+		autoSaveDelay: 30, // In ticks
+		euroNumbers: false,
+	},
+	gameState: {},
+	
+	init: function() {
+		var args = arguments;
 		for(var property in args) {
 			if(!this[property]) this[property] = args[property];
 		}
-	},
-	
-	name: '', //the name of the profile
-	created: 0, //date profile was created
-	lastPlayed: 0, //last time the profile was used
-	options: { //holds engine option settings
-		autoSave: true,
-		autoSaveDelay: 30, //in ticks
-		euroNumbers: false,
 	}
-	
 });
 
-mice.Profiles = new function() {
-	var profiles = {};
-	// Access to profiles for testing purposes
-	this.profiles = function() { return profiles; };
-	
-	// Profile Interface with default properties and values
-	var ProfileBase = function() {
-		return {
-			name: '', 
-			created: 0, 
-			lastPlayed: 0, 
-			options: {
-				autoSave: true, 
-				autoSaveDelay: 30, 
-				euroNumbers: false
-			}
-		};
-	};
-	
-	// Profile Constructor
-	var Profile = function(params) {
-		for (var p in params)
-			if (typeof this[p] !== 'undefined')
-				this[p] = params[p];
-		return this;
-	};
-	
-	// Create a new Profile
-	this.Create = function(params) {
-		profiles[params.name] = Profile.call((new ProfileBase()), params);
-	};
-	
-	// Delete a Profile
-	this.Delete = function(name) {
-		delete profiles[name];
-		this.Active = undefined;
-	};
-	
-	// Set selected Profile as Active Profile
-	this.SetActive = function(name) {
-		this.Active = profiles[name];
-	};
-};
-
-
-/**************************************************************
- * State management
- *************************************************************/
-
-mice.State = new function() {
-	// Game Object references to track and include in saveState
-	var track = [mice];
+mice.ProfileManager = new function() {
+	var profiles = []; // List of known profiles
+	this.profiles = function() {return profiles;} // [TEMP] For testing
+	var track = []; // Game Object references to track and include in saveState
+	var activeProfile = null;
 	
 	// Interface for a Game to add Objects to track and include in saveState
 	this.Track = function() {
 		var args = arguments;
-		for (var i = 0; i < args.length; i++)
+		for (var i in args)
 			if (typeof args[i] === 'object')
 				track.push(args[i]);
 	};
 	
+	// Create a new Profile and set it to be the active one
+	this.createNewProfile = function() {
+		var args = arguments;
+		var profileName = args.name || profiles.length; // In case no name is provided so 'default' isn't used repeatedly
+		profiles[profileName] = new mice.Profile(args);
+		this.setActiveProfile[profileName];
+		// [NOTE] Probably want to do error handling when profile name exists
+	}
+	
+	this.setActiveProfile = function(name) {
+		activeProfile = profiles[name];
+	};
+	
+	this.deleteProfile = function(name) {
+		delete profiles[name];
+		// [NOTE] Might have to add something for permanently deleting a saved profile from localStorage
+		// so that we can save profiles one at a time (localStorage.removeItem(name))
+	}
+	
 	// Save a saveState
-	this.Save = function() {
+	this.save = function() {
 		return Base64.encode(JSON.stringify(track));
 	};
 	
 	// Load a saveState
-	this.Load = function(test) {
+	this.load = function(test) {
 		track = JSON.parse(Base64.decode(test));
 		return track;
 	};
 	
 	// Export a saveState
-	this.Export = function() {
+	this.export = function() {
 		return Base64.encode(JSON.stringify(track));
 	};
 	
 	// Import a saveState
-	this.Import = function(test) {
+	this.import = function(test) {
 		track = JSON.parse(Base64.decode(test));
 		return track;
 	};
 };
 
-/*
-MICEngine.save = function() {
-	
-}
 
-MICEngine.load = function(profile) {
+/**************************************************************
+ * Display management
+ *************************************************************/
+
+mice.Layout = Class.extend({
 	
-}
-*/
+});
+
+mice.LayoutManager = function() {
+	
+};
 
 
 /**************************************************************

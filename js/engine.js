@@ -17,10 +17,6 @@
 	var logger = {}; // [MAYBE] Shorthand for mice logger
 	var SCB = {}; // Game object, in this case SCB (SandCastle Builder), !!!! replace with your game object !!!!
 	
-	// Youri: [TEMP] Required to prevent error
-	SCB.onTick = function() { return; };
-	SCB.onCycle = function() { return; };
-	
 	MICEngine.init = function() {
 		// CONSTANTS
 		mice.FPS = 30; // Used for repaint
@@ -47,11 +43,11 @@
 		mice.autoSaveTicks = 0; // Number of ticks since last save
 		mice.doSave = false; // Auto save this tick?
 		
-		// Allows for the possibility of "save slots"
-		// Would be nice to add a way to autoload last used profile
-		mice.profile = new mice.Profile({ name: 'default' }); 
-		
-		mice.options = mice.profile.options;
+		mice.options = {
+				autoSave: true,
+				autoSaveDelay: 30, // In ticks
+				euroNumbers: false
+				};
 		
 		// Each object included has it's onCycle or onTick method called per cycle or tick
 		mice.callPerCycle = [SCB];
@@ -59,6 +55,8 @@
 		
 		// Start loading stuff
 		mice.initContent();
+		mice.ProfileManager.init();
+		mice.LayoutManager.init();
 		//SCB.init(); //!!!! replace with your game initialization !!!!
 		
 		mice.loaded = true;
@@ -80,7 +78,7 @@
 	 * !!!! Contains the main game logic loops. !!!!
 	 *************************************************************/
 	
-	MICEngine.tick = function() {
+	MICEngine.update = function() {
 		mice.onTick();
 		mice.tickCount ++;
 		if (mice.tickCount >= mice.TICKS_PER_CYCLE) {
@@ -91,7 +89,7 @@
 		
 		// SAVE LAST!
 		if (mice.doSave) {
-			mice.save();
+			mice.ProfileManager.save();
 			mice.autoSaveTicks = 0;
 			mice.doSave = false;
 		}
@@ -127,7 +125,7 @@
 		// Trigger ticks until catching up to the current tick
 		while (mice.elapsed > mice.TICK_LENGTH) {
 			try {
-				mice.tick();
+				mice.update();
 			} catch(e) {
 				mice.Logger.Log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
 				throw e;
