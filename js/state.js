@@ -44,7 +44,6 @@ mice.ProfileManager = new function() {
 	// Create a new Profile and set it to be the active one
 	this.createNewProfile = function(args) {
 		var profileName = args.name || profiles.length; // In case no name is provided so 'default' isn't defined repeatedly
-		console.log(profileName);
 		profiles[profileName] = new mice.Profile(args);
 		this.setActiveProfile[profileName];
 		// [NOTE] Probably want to do error handling when profile name exists
