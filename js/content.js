@@ -25,6 +25,7 @@ MICEngine.initContent = function() {
 			}
 		},
 		
+		//Youri: replacing by MICEngine.State.track
 		track: [], //list of object properties tracked for save/load
 		
 		//assign any properties left over from overwritten init functions

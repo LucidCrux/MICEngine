@@ -9,6 +9,33 @@
  
   // The base Class implementation (does nothing)
   this.Class = function(){};
+  
+//Default initialization that just assign all properties passed in
+  Class.prototype.init =  function(args) {
+  	for(var a in args){
+  		if(typeof this[a] === 'undefined')
+  			this[a] = args[a];
+  		else
+  			this[a] = this.deepAssign(this[a] || {}, args[a]);
+  	}
+  },
+  
+  // Recursively assign properties making partial assignment possible
+  Class.prototype.deepAssign = function(assignee, args) {
+  	var newProp = assignee;
+  	if(typeof newProp === 'object') {
+  		for(var a in args){
+  			if(typeof newProp[a] === 'undefined' || newProp[a] == null)
+  				newProp[a] = args[a];
+  			else
+  				newProp[a] = this.deepAssign(newProp[a] || {}, args[a]);
+  		}
+  	} else {
+  		newProp = args;
+  	}
+  	
+  	return newProp;
+  },
  
   // Create a new Class that inherits from this class
   Class.extend = function(prop) {
