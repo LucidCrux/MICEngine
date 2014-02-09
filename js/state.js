@@ -6,7 +6,6 @@
  * Contains various functions related to managing game states
  *************************************************************/
 
-
 /**************************************************************
  * Profile management
  *************************************************************/
@@ -14,27 +13,25 @@
 mice.Profile = Class.extend({
 	name: 'default',
 	created: new Date(), // Date profile was created
-	lastPlayed: this.created,
+	lastPlayed: new Date(),
 	options: { // Holds engine option settings
 		autoSave: true,
 		autoSaveDelay: 30, // In ticks
 		euroNumbers: false,
+		suboption: { 1:1, 2:2} // [TEMP] For testing deep property assignment
 	},
 	gameState: {},
-	
-	init: function() {
-		var args = arguments;
-		for(var property in args) {
-			if(!this[property]) this[property] = args[property];
-		}
-	}
 });
 
 mice.ProfileManager = new function() {
-	var profiles = []; // List of known profiles
+	var profiles = {}; // List of known profiles
 	this.profiles = function() {return profiles;} // [TEMP] For testing
 	var track = []; // Game Object references to track and include in saveState
 	var activeProfile = null;
+	
+	this.init = function() {
+		// In case we need to set up anything, perhaps autoload last used profile
+	}
 	
 	// Interface for a Game to add Objects to track and include in saveState
 	this.Track = function() {
@@ -45,9 +42,9 @@ mice.ProfileManager = new function() {
 	};
 	
 	// Create a new Profile and set it to be the active one
-	this.createNewProfile = function() {
-		var args = arguments;
-		var profileName = args.name || profiles.length; // In case no name is provided so 'default' isn't used repeatedly
+	this.createNewProfile = function(args) {
+		var profileName = args.name || profiles.length; // In case no name is provided so 'default' isn't defined repeatedly
+		console.log(profileName);
 		profiles[profileName] = new mice.Profile(args);
 		this.setActiveProfile[profileName];
 		// [NOTE] Probably want to do error handling when profile name exists
@@ -96,7 +93,9 @@ mice.Layout = Class.extend({
 });
 
 mice.LayoutManager = function() {
-	
+	this.init = function() {
+		// Setup
+	}
 };
 
 
