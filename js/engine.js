@@ -15,7 +15,7 @@ var MICEngine = {}; // Molpy Inspired Cyclic Engine
 var mice = MICEngine; // Shorthand
 var Content = {}; // Holds all Content
 var logger = {}; // [MAYBE] Shorthand for mice logger
-var SCB = {}; // Game object, in this case SCB (SandCastle Builder), !!!! replace with your game object !!!!
+var Game = {}; // Game object. Be sure to define this in your game file ( mice.Game = YourGameObj; ) see SCB.js!!!!
 
 MICEngine.init = function() {
 	// CONSTANTS
@@ -26,7 +26,7 @@ MICEngine.init = function() {
 	
 	// Calculated
 	if (3600 % mice.CYCLES_PER_HOUR != 0) {
-		mice.Logger.Log('Invalid cycles per hour set: engine.js > MICEngine.init()', 'error');
+		mice.log('Invalid cycles per hour set: engine.js > MICEngine.init()', 'error');
 		return;
 	};
 	mice.HOURS_PER_CYCLE = (1 / mice.CYCLES_PER_HOUR == 1) ? 1 : 0; // Whole hours per cycle
@@ -50,14 +50,14 @@ MICEngine.init = function() {
 			};
 	
 	// Each object included has it's onCycle or onTick method called per cycle or tick
-	mice.callPerCycle = [SCB];
-	mice.callPerTick = [SCB];
+	mice.callPerCycle = [mice.Game];
+	mice.callPerTick = [mice.Game];
 	
 	// Start loading stuff
 	mice.initContent();
 	//mice.ProfileManager.init();
 	//mice.LayoutManager.init();
-	//SCB.init(); //!!!! replace with your game initialization !!!!
+	//mice.Game.init();
 	
 	mice.loaded = true;
 }
@@ -81,7 +81,7 @@ MICEngine.update = function() {
 	mice.tickCount ++;
 	if (mice.tickCount >= mice.TICKS_PER_CYCLE) {
 		mice.tickCount = 1;
-		mice.Logger.Log('Cycle '+ mice.cycleNum +' finished');
+		mice.log('Cycle '+ mice.cycleNum +' finished');
 		mice.onCycle();
 	}
 	
@@ -125,7 +125,7 @@ MICEngine.gameLoop = function() {
 		try {
 			mice.update();
 		} catch(e) {
-			mice.Logger.Log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
+			mice.log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
 			throw e;
 			return;
 		}
@@ -134,7 +134,7 @@ MICEngine.gameLoop = function() {
 	try {
 		mice.draw();
 	} catch(e) {
-		mice.Logger.Log('Error drawing game:\n' + e + '\n\n' + e.stack, 'error');
+		mice.log('Error drawing game:\n' + e + '\n\n' + e.stack, 'error');
 		throw e;
 		return;
 	}
@@ -226,8 +226,8 @@ jQuery.fn.canColorBorder = function() {
 window.onload = function() {
 	MICEngine.init();
 	if (mice.loaded) {
-		mice.Logger.Log('MICE loaded.');
+		mice.log('MICE loaded.');
 		mice.gameLoop(); // Start the game
 	} else
-		mice.Logger.Log('Failed to load MICEngine.', 'error');
+		mice.log('Failed to load MICEngine.', 'error');
 };

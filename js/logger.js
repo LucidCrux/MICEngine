@@ -25,7 +25,7 @@ mice.Logger = new function() {
 	};
 	
 	// Create a new Log
-	this.Log = function(log, type) {
+	this.log = function(log, type) {
 		log = log || '';
 		type = type || 'log'; // error, warn, log :: As per function names for Console API
 		
@@ -34,7 +34,12 @@ mice.Logger = new function() {
 	};
 	
 	// Clears logs array
-	this.ClearLog = function() {
+	this.clearLog = function() {
 		log = [];
 	};
 };
+
+//shortcut for logging
+mice.log = function(log, type) {
+	mice.Logger.log(log, type);
+}
