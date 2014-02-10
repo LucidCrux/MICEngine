@@ -20,8 +20,8 @@ MICEngine.init = function() {
 	// CONSTANTS
 	mice.FPS = 30; // Used for repaint
 	mice.VERSION = 0.1;
-	mice.CYCLES_PER_HOUR = 1; // Must be integer factor of 3600
-	mice.TICKS_PER_CYCLE = 1000; // Updates per cycle
+	mice.CYCLES_PER_HOUR = 60; // Must be integer factor of 3600
+	mice.TICKS_PER_CYCLE = 60; // Updates per cycle
 	
 	// Calculated
 	if (3600 % mice.CYCLES_PER_HOUR != 0) {
@@ -57,6 +57,8 @@ MICEngine.init = function() {
 	//mice.ProfileManager.init();
 	//mice.LayoutManager.init();
 	//mice.Game.init();
+	
+	mice.syncTickCount();
 	
 	mice.loaded = true;
 }
@@ -158,6 +160,12 @@ MICEngine.getCycleStart = function(cycleFactor){
 		time.setMinutes(0, 0, 0)
 	
 	return time;
+}
+
+// Updates the tick count to match system time
+MICEngine.syncTickCount = function() {
+	var timeDif = mice.time - mice.cycleStartTime.getTime();
+	mice.tickCount = Math.floor(timeDif / mice.TICK_LENGTH);
 }
 
 
