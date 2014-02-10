@@ -14,7 +14,6 @@
 var MICEngine = {}; // Molpy Inspired Cyclic Engine
 var mice = MICEngine; // Shorthand
 var Content = {}; // Holds all Content
-var logger = {}; // [MAYBE] Shorthand for mice logger
 var Game = {}; // Game object. Be sure to define this in your game file ( mice.Game = YourGameObj; ) see SCB.js!!!!
 
 MICEngine.init = function() {
@@ -177,16 +176,6 @@ MICEngine.draw = function() {
  * Other functions
  * Probably should change regroup these later
  *************************************************************/
-
-// Youri: Replacing by MICEngine.State.Save
-MICEngine.save = function() {
-	
-}
-
-// Youri: Replacing by MICEngine.State.Load
-MICEngine.load = function(profile) {
-	
-}
 
 
 /**************************************************************
