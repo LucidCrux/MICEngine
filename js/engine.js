@@ -74,7 +74,7 @@ MICEngine.init = function() {
  * 
  * Functions relating to time progression, game ticks, and
  * new cycles.
- * !!!! Contains the main game logic loops. !!!!
+ * !! Contains the main game logic loops. !!
  *************************************************************/
 
 MICEngine.update = function(numTicks) {
@@ -174,7 +174,8 @@ MICEngine.syncTickCount = function() {
  *************************************************************/
 
 MICEngine.draw = function() {
-	g('onlydiv').innerHTML = mice.tickCount;
+	g('onlydiv').innerHTML = 'Cycle: ' + mice.cycleNum + '<br>'
+	                       + 'Tick Number: ' + mice.tickCount;
 }
 
 
