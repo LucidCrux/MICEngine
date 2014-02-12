@@ -77,13 +77,13 @@ MICEngine.init = function() {
  * !!!! Contains the main game logic loops. !!!!
  *************************************************************/
 
-MICEngine.update = function() {
-	mice.onTick();
-	mice.tickCount ++;
-	if (mice.tickCount >= mice.TICKS_PER_CYCLE) {
-		mice.tickCount = 1;
-		mice.log('Cycle '+ mice.cycleNum +' finished');
-		mice.onCycle();
+MICEngine.update = function(numTicks) {
+	mice.onTick(numTicks);
+	mice.tickCount += numTicks;
+	var numCycles = Math.floor(mice.tickCount / mice.TICKS_PER_CYCLE);
+	mice.tickCount -= numCycles * mice.TICKS_PER_CYCLE;
+	if (numCycles >= 1) {
+		mice.onCycle(numCycles);
 	}
 	
 	// SAVE LAST!
@@ -94,22 +94,22 @@ MICEngine.update = function() {
 	}
 }
 
-MICEngine.onTick = function() {
-	mice.autoSaveTicks++;
+MICEngine.onTick = function(numTicks) {
+	mice.autoSaveTicks += numTicks;
 	if (mice.options.autoSave && mice.options.autoSaveDelay < mice.autoSaveTicks)
 		mice.doSave = true;
 	
 	// Call object tick methods
 	for (var obj in mice.callPerTick)
-		mice.callPerTick[obj].onTick();
+		mice.callPerTick[obj].onTick(numTicks);
 }
 
-MICEngine.onCycle = function() {
-	mice.cycleNum ++;
+MICEngine.onCycle = function(numCycles) {
+	mice.cycleNum += numCycles;
 	
 	// Call object cycle methods
 	for (var obj in mice.callPerCycle)
-		mice.callPerCycle[obj].onCycle();
+		mice.callPerCycle[obj].onCycle(numCycles);
 }
 
 
@@ -119,18 +119,16 @@ MICEngine.gameLoop = function() {
 	var oldTime = mice.time;
 	mice.time = new Date().getTime();
 	mice.elapsed += (mice.time - oldTime);
-	mice.elapsed = Math.min(mice.elapsed, (mice.TICK_LENGTH * 5)); //limit lag to 5 ticks
+	var tickLag = Math.floor(mice.elapsed / mice.TICK_LENGTH); // Number of ticks since last loop
+	mice.elapsed -= (tickLag * mice.TICK_LENGTH);
+	//mice.elapsed = Math.min(mice.elapsed, (mice.TICK_LENGTH * 5)); //limit lag to 5 ticks
 	
-	// Trigger ticks until catching up to the current tick
-	while (mice.elapsed > mice.TICK_LENGTH) {
-		try {
-			mice.update();
-		} catch(e) {
-			mice.log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
-			throw e;
-			return;
-		}
-		mice.elapsed -= mice.TICK_LENGTH;
+	try {
+		mice.update(tickLag);
+	} catch(e) {
+		mice.log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
+		throw e;
+		return;
 	}
 	try {
 		mice.draw();
