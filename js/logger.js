@@ -36,7 +36,7 @@ Logger = new function() {
 	};
 	
 	// Create a new log
-	this.addLog = function(name, listArray) {
+	this.addLog = function(name, list) {
 		if(logs[name]) {
 			Logger.log('The log "' + name + '" already exists.', this.ERROR);
 			return;
@@ -44,7 +44,7 @@ Logger = new function() {
 		
 		logs[name] = {
 				id: name,
-				entryList: entryArray || [],
+				entryList: list || [],
 		}
 		
 		if(logs[name]) Logger.log('Log "' + name + '" created succesfully.', this.INFO);
