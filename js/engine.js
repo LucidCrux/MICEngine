@@ -14,6 +14,7 @@
 var MICEngine = {}; // Molpy Inspired Cyclic Engine
 var mice = MICEngine; // Shorthand
 var Content = {}; // Holds all Content
+var Logger = {};
 var Game = {}; // Game object. Be sure to define this in your game file ( mice.Game = YourGameObj; ) see SCB.js!!!!
 
 MICEngine.init = function() {
@@ -25,7 +26,7 @@ MICEngine.init = function() {
 	
 	// Calculated
 	if (3600 % mice.CYCLES_PER_HOUR != 0) {
-		mice.log('Invalid cycles per hour set: engine.js > MICEngine.init()', 'error');
+		Logger.log('Invalid cycles per hour set: engine.js > MICEngine.init()', logger.ERROR);
 		return;
 	};
 	mice.HOURS_PER_CYCLE = (1 / mice.CYCLES_PER_HOUR == 1) ? 1 : 0; // Whole hours per cycle
@@ -34,6 +35,8 @@ MICEngine.init = function() {
 	mice.TICK_LENGTH = ((mice.HOURS_PER_CYCLE * 3600) + (mice.MINS_PER_CYCLE * 60) + mice.SECS_PER_CYCLE) * 1000 / mice.TICKS_PER_CYCLE; // Milliseconds per game tick
 	
 	// Engine Variables
+	mice.debug = false;
+	mice.consoleLogLevel = Logger.WARN; // Determines what gets sent to the console, includes those below :: ALL, INFO, WARN, ERROR
 	mice.tickCount = 0; // Tick number of current cycle
 	mice.time = new Date().getTime();
 	mice.cycleNum = 1; // Cycle number the game is currently on
@@ -126,14 +129,14 @@ MICEngine.gameLoop = function() {
 	try {
 		mice.update(tickLag);
 	} catch(e) {
-		mice.log('Game tick error:\n' + e + '\n\n' + e.stack, 'error');
+		Logger.log('Game tick error:\n' + e + '\n\n' + e.stack, logger.ERROR);
 		throw e;
 		return;
 	}
 	try {
 		mice.draw();
 	} catch(e) {
-		mice.log('Error drawing game:\n' + e + '\n\n' + e.stack, 'error');
+		Logger.log('Error drawing game:\n' + e + '\n\n' + e.stack, logger.ERROR);
 		throw e;
 		return;
 	}
@@ -222,8 +225,8 @@ jQuery.fn.canColorBorder = function() {
 window.onload = function() {
 	MICEngine.init();
 	if (mice.loaded) {
-		mice.log('MICE loaded.');
+		Logger.log('MICE loaded.', Logger.INFO);
 		mice.gameLoop(); // Start the game
 	} else
-		mice.log('Failed to load MICEngine.', 'error');
+		Logger.log('Failed to load MICEngine.', logger.ERROR);
 };
